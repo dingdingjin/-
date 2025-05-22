@@ -1,0 +1,31 @@
+name: Manual Approval First Job
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  wait_for_approval:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      # 需要在 GitHub 仓库的 Settings -> Environments 里配置 production 环境的 Required reviewers。
+    steps:
+      - name: Wait for manual approval
+        run: echo "Waiting for manual approval via environment protection rule..."
+
+  build_and_deploy:
+    needs: wait_for_approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Deploy
+        run: echo "Deploying..."
